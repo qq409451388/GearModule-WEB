@@ -1,5 +1,5 @@
 <?php
-class EzTcp2 extends BaseTcpClient
+class EzTcp extends BaseTcpClient
 {
     private $read = [];
     private $readCallback = [];
@@ -7,7 +7,7 @@ class EzTcp2 extends BaseTcpClient
     public function init($ip, $port):BaseTcpClient{
         parent::init($ip, $port);
         $this->conn = stream_socket_client("tcp://{$ip}:{$port}", $errno, $errstr);
-        DBC::assertEquals(0, $errno, "[EzTcp2] Exception Caused by $errstr", $errno);
+        DBC::assertEquals(0, $errno, "[EzTcp] Exception Caused by $errstr", $errno);
         $this->addMain();
         return $this;
     }

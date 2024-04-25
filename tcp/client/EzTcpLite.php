@@ -1,5 +1,5 @@
 <?php
-class EzTCP extends BaseTcpClient
+class EzTcpLite extends BaseTcpClient
 {
     public function init($ip, $port):BaseTcpClient{
         parent::init($ip, $port);
