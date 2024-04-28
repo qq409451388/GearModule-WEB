@@ -64,4 +64,9 @@ class TcpMessage extends NetWorkRequest implements IRequest, IResponse
         ];
         return $s;
     }
+
+    public function setIsInit(bool $isInit)
+    {
+        $this->init = $isInit;
+    }
 }

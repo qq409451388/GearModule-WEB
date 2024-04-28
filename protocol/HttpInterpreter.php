@@ -226,7 +226,7 @@ class HttpInterpreter implements Interpreter
                 $response = $response->toJson();
                 $contentType = HttpMimeType::MIME_JSON;
             } elseif (is_array($response) || is_object($response)) {
-                $response = EzString::encodeJson($response);
+                $response = EzCodecUtils::encodeJson($response);
                 $contentType = HttpMimeType::MIME_JSON;
             }
             return new Response(HttpStatus::OK(), $response, $contentType);

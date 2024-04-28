@@ -18,6 +18,8 @@ interface IRequest
 
     public function isInit():bool;
 
+    public function setIsInit(bool $isInit);
+
     /**
      * filter some args from requests
      * @return mixed

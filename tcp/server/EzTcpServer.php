@@ -1,25 +1,36 @@
 <?php
-class EzTcpServer extends BaseTcpServer
+class EzTcpServer extends AbstractWebServer
 {
-    
+    private $responseBuilder;
+
+    protected $keepAlive = false;
+    /**
+     * @var EzTcpServerConnection $serverConnection
+     */
+    protected $serverConnection;
+
+    /**
+     * @var int 连接超时时间（单位：s）
+     */
+    protected $timeOut = 3;
+
+    /**
+     * socket read长度
+     */
+    const SOCKET_READ_LENGTH = 1024000;
+
+    /**
+     * 保留字 MASTER alias
+     */
+    const MASTER = "EZTCP_MASTER";
+
+    protected $isInit = false;
+
     protected $requestPool = [];
-    /**
-     * @var Closure Request对象生成器匿名函数
-     */
-    private $requestHandler;
 
-    /**
-     * @var Closure Response对象生成器匿名函数
-     */
-    private $responseHandler;
+    public function __construct($ip, $port) {
+        parent::__construct($ip, $port);
 
-    public function __construct(string $ip, $port, $schema = "") {
-        parent::__construct($ip, $port, $schema);
-    }
-
-    public function init() {
-        DBC::assertNonNull($this->requestHandler, "[EzTcpServer] Must setRequestHandler! But Null.");
-        DBC::assertNonNull($this->responseHandler, "[EzTcpServer] Must setResponseHandler! But Null.");
         $master = socket_create(AF_INET, SOCK_STREAM, 0);
         $this->serverConnection = new EzTcpServerConnection($master);
         //复用地址
@@ -37,9 +48,10 @@ class EzTcpServer extends BaseTcpServer
         socket_set_option($this->getMaster(),SOL_SOCKET,SO_SNDTIMEO,["sec"=>3, "usec"=>0]);
         socket_set_nonblock($this->getMaster());
         $this->addConnectPool($this->getMaster(), self::MASTER);
+
         $this->isInit = true;
     }
-    
+
     private function getMaster() {
         return $this->serverConnection->getMaster();
     }
@@ -51,11 +63,10 @@ class EzTcpServer extends BaseTcpServer
 
 
     /**
-     * 加入连接池
+     * 当一个新的client进来后，将其加入连接池
      * @param $clientSocket
      * @param $alias
      * @return void
-     * @throws Exception
      */
     protected function addConnectPool($clientSocket, $alias) {
         if (is_null($clientSocket)) {
@@ -81,8 +92,8 @@ class EzTcpServer extends BaseTcpServer
     }
 
     /**
-     * 接入新客户端
-     * @return Socket|null socket资源
+     * 监听master拿到新的client socket
+     * @return socket
      */
     protected function newConnect() {
         //新连接加入
@@ -108,9 +119,15 @@ class EzTcpServer extends BaseTcpServer
             return;
         }
         $this->serverConnection->disconnect($clientSocket);
-        Logger::console($clientSocket." CLOSED!");
+        Logger::console(spl_object_id($clientSocket)." CLOSED!");
     }
 
+    /**
+     * 向socket写入
+     * @param $socket
+     * @param $content
+     * @return void
+     */
     protected function writeSocket($socket, $content) {
         try {
             do {
@@ -150,7 +167,7 @@ class EzTcpServer extends BaseTcpServer
                     $socket = $this->newConnect();
                     if (!is_null($socket)) {
                         //刚刚建立连接的socket对象没有别名
-                        $this->addConnectPool($socket, (string)$socket);
+                        $this->addConnectPool($socket, spl_object_id($socket));
                     }
                 } else {
                     $readLength = self::SOCKET_READ_LENGTH;
@@ -163,11 +180,9 @@ class EzTcpServer extends BaseTcpServer
                     $connection = new EzConnection();
                     $connection->setBuffer($buffer);
                     $connection->setClientSocket($readSocket);
-                    $connection->setServerSocket($this->getMaster());
-                    $connection->setServerConnection($this->serverConnection);
                     //接收并处理消息体
                     $request = $this->buildRequest($connection, $lastRequest);
-                    $request->setRequestId((int) $readSocket);
+                    $request->setRequestId(spl_object_id($readSocket));
                     $this->checkAndClearRequest($request);
                     if ($request->isInit()) {
                         $response = $this->buildResponse($connection, $request);
@@ -183,7 +198,7 @@ class EzTcpServer extends BaseTcpServer
     }
 
     private function getLastRequest($clientSocket) {
-        return $this->requestPool[(int) $clientSocket]??null;
+        return $this->requestPool[spl_object_id($clientSocket)]??null;
     }
 
     private function checkAndClearRequest(IRequest $request) {
@@ -194,44 +209,84 @@ class EzTcpServer extends BaseTcpServer
         }
     }
 
+
+
+    public function close() {
+        if (is_resource($this->getMaster())) {
+            socket_close($this->getMaster());
+        }
+    }
+
     /**
-     * @param EzConnection $connection
-     * @param IRequest|NULL $request
-     * @return IRequest
+     * 状态检查 stop the world
+     * @return void
      */
-    protected function buildRequest(EzConnection $connection, $request = null): IRequest
-    {
-        return ($this->requestHandler)($connection, $request);
+    protected function periodicityCheck(){
+        if(time() % 10000 != 0){
+            return;
+        }
+        $connectionPool = $this->serverConnection->getConnectPool();
+        foreach ($connectionPool as $alias => $connection) {
+            if (self::MASTER == $alias) {
+                continue;
+            }
+            if (!$this->checkClientAlive($connection)) {
+                $this->disConnect($connection);
+            }
+        }
+    }
+
+    private function checkClientAlive($connection) {
+        if (!is_resource($connection)) {
+            Logger::console(spl_object_id($connection));
+            return false;
+        }
+        return socket_read($connection, 0);
+    }
+
+    public function setKeepAlive() {
+        $this->keepAlive = true;
+    }
+
+    public function setNoKeepAlive() {
+        $this->keepAlive = false;
+    }
+
+    public function __destory() {
+        $this->close();
+    }
+
+    protected function setPropertyCustom() {
     }
 
     protected function buildResponse(EzConnection $connection, IRequest $request): IResponse
     {
-        return ($this->responseHandler)($connection, $request);
+        return ($this->responseBuilder)($request);
     }
 
-    /**
-     * 请求对象构建函数
-     * @param Closure $requestHandler {@see EzTcpServer::buildRequest()}
-     * @return $this
-     */
+    protected function getInterpreter(): Interpreter
+    {
+        $interpreter = new BasicInterpreter();
+        $interpreter->setRequestHandler(function ($buffer) {
+            $msg = new TcpMessage();
+            $msg->data = $buffer;
+            return $msg;
+        });
+        $interpreter->setResponseHandler(function (IResponse $response) {
+            return $response->toString();
+        });
+        return $interpreter;
+    }
+
     public function setRequestHandler(Closure $requestHandler) {
-        $this->requestHandler = $requestHandler;
-        return $this;
+        $this->interpreter->setRequestHandler($requestHandler);
     }
 
-    /**
-     * 响应对象构建函数
-     * @param Closure $responseHandler {@see EzTcpServer::buildResponse()}
-     * @return $this
-     */
     public function setResponseHandler(Closure $responseHandler) {
-        $this->responseHandler = $responseHandler;
-        return $this;
+        $this->interpreter->setResponseHandler($responseHandler);
     }
 
-    protected function closeServer() {
-        if (is_resource($this->getMaster())) {
-            socket_close($this->getMaster());
-        }
+    public function setResponseBuilder(Closure $responseBuilder) {
+        $this->responseBuilder = $responseBuilder;
     }
 }

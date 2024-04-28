@@ -1,6 +1,8 @@
 <?php
 class SchemaConst
 {
+    const TCP = "tcp";
+
     const HTTP = "http";
     const HTTPS = "https";
     const WEBSOCKET = "ws";

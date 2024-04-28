@@ -3,6 +3,7 @@ interface Interpreter
 {
     /**
      * 获取协议名
+     * @see SchemaConst
      * @return string
      */
     public function getSchema():string;

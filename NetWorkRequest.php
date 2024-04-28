@@ -7,6 +7,8 @@ abstract class NetWorkRequest implements IRequest
      */
     private $connection;
 
+    protected $isInit;
+
     /**
      * @return EzConnection
      */
