@@ -73,7 +73,7 @@ class HttpInterpreter implements Interpreter
                     continue;
                 }
                 $pos = strpos($httpOption, ":");
-                $key = EzString::camelCase(substr($httpOption, 0, $pos), "-");
+                $key = EzStringUtils::camelCase(substr($httpOption, 0, $pos), "-");
                 $value = trim(substr($httpOption, $pos+1));
                 if($key == "contentType"){
                     $contentType = explode(";", $value);
@@ -202,34 +202,4 @@ class HttpInterpreter implements Interpreter
         }
     }
 
-    public function getNotFoundResourceResponse(IRequest $request): IResponse {
-        return new Response(HttpStatus::NOT_FOUND());
-    }
-
-    public function getNetErrorResponse(IRequest $request, string $errorMessage = ""): IResponse {
-        return new Response(HttpStatus::INTERNAL_SERVER_ERROR(), $errorMessage);
-    }
-
-    public function getDynamicResponse(IRequest $request): IResponse {
-        /**
-         * @var Request $request
-         */
-        $router = $request->getDispatcher()->matchedRouteMapping($request->getPath());
-        if ($router instanceof NullMapping) {
-            return $this->getNotFoundResourceResponse($request);
-        } else {
-            $request->setRequestSource(null);
-            $response = $router->disPatch($request);
-            if ($response instanceof IResponse) {
-                return $response;
-            } elseif ($response instanceof EzRpcResponse) {
-                $response = $response->toJson();
-                $contentType = HttpMimeType::MIME_JSON;
-            } elseif (is_array($response) || is_object($response)) {
-                $response = EzCodecUtils::encodeJson($response);
-                $contentType = HttpMimeType::MIME_JSON;
-            }
-            return new Response(HttpStatus::OK(), $response, $contentType);
-        }
-    }
 }

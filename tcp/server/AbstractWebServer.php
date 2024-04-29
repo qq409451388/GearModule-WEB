@@ -26,7 +26,7 @@ abstract class AbstractWebServer
         $this->ip = $ip;
         $this->port = $port;
         Config::set(['application.server.ip'=>$ip, 'application.server.port'=>$port]);
-        $this->interpreter = $this->getInterpreter();
+        $this->interpreter = $this->initInterpreter();
         $this->schema = $this->interpreter->getSchema();
         Config::setOne('application.server.schema', $this->interpreter->getSchema());
         $this->setPropertyCustom();
@@ -36,7 +36,7 @@ abstract class AbstractWebServer
      * 注入协议解释器
      * @return void
      */
-    abstract protected function getInterpreter():Interpreter;
+    abstract protected function initInterpreter():Interpreter;
 
     /**
      * 根据interpreter将IResponse对象转码成响应字符流
@@ -107,4 +107,20 @@ abstract class AbstractWebServer
      * @return void
      */
     public abstract function close();
+
+    /**
+     * 获取资源未找到响应
+     * @param IRequest $request
+     * @return IResponse
+     */
+    protected abstract function getNotFoundResourceResponse(IRequest $request):IResponse;
+
+    /**
+     * 获取网络错误响应
+     * @param IRequest $request
+     * @param string $errorMessage
+     * @return IResponse
+     */
+    protected abstract function getNetErrorResponse(IRequest $request, string $errorMessage = ""):IResponse;
+
 }
