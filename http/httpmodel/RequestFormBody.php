@@ -1,6 +1,6 @@
 <?php
 
-class RequestNormalBody implements EzDataObject
+class RequestFormBody implements EzDataObject
 {
     /**
      * @var array<string, string>
@@ -23,11 +23,11 @@ class RequestNormalBody implements EzDataObject
         }
     }
 
-    public function getStruct($k) {
+    public function getForm($k) {
         return $this->data[$k]??null;
     }
 
-    public function getAll() {
+    public function getAllForm() {
         return $this->data;
     }
 }

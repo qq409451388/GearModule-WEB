@@ -43,6 +43,12 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
         $this->query[$key] = $value;
     }
 
+    public function setQuerys(array $arr) {
+        foreach ($arr as $key => $value) {
+            $this->setQuery($key, $value);
+        }
+    }
+
     public function get($key, $default=null){
         return isset($this->query[$key]) ? $this->query[$key] : $default;
     }
@@ -75,10 +81,10 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
     /**
      * 获取请求体
      * @var RequestJsonBody $body when {@link HttpMimeType::MIME_JSON}
-     * @var RequestNormalBody $body when {@link HttpMimeType::MIME_WWW_FORM_URLENCODED}
+     * @var RequestFormBody $body when {@link HttpMimeType::MIME_WWW_FORM_URLENCODED}
      * @var RequestMultiBody $body when {@link HttpMimeType::MIME_MULTI_FORM}
      * @var RequestBody $body when else Content-type
-     * @return RequestBody|RequestJsonBody|RequestMultiBody|RequestNormalBody
+     * @return RequestBody|RequestJsonBody|RequestMultiBody|RequestFormBody
      */
     public function getBody() {
         return $this->body;
@@ -92,10 +98,10 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
     }
 
     /**
-     * @return RequestNormalBody|null
+     * @return RequestFormBody|null
      */
     public function getNormalRequestBody() {
-        return $this->body instanceof RequestNormalBody ? $this->body : null;
+        return $this->body instanceof RequestFormBody ? $this->body : null;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-class RequestJsonBody implements EzDataObject
+class RequestJsonBody extends RequestBody implements EzDataObject
 {
     /**
      * @var string $contentType
@@ -17,10 +17,10 @@ class RequestJsonBody implements EzDataObject
     }
 
     public function getData() {
-        return EzCollectionUtils::decodeJson($this->content);
+        return EzCodecUtils::decodeJson($this->content);
     }
 
     public function getObject(Clazz $clazz) {
-        return EzBeanUtils::createObjectFromJson($this->content, $clazz->getName());
+        return EzObjectUtils::createFromJson($this->content, $clazz->getName());
     }
 }

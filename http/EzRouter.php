@@ -45,7 +45,7 @@ class EzRouter implements EzBean
     public function getMapping($path):IRouteMapping {
         $path = strtolower($path);
         $mapping = $this->urlMap[$path]??null;
-        DBC::assertNonNull($mapping, "NotFound Path.", 4000, GearNotFoundResourceException::class);
+        DBC::assertNonNull($mapping, "NotFound Path -- [$path].", 4000, GearNotFoundResourceException::class);
         $pathExplained = explode("/", $path);
         $tmpUrlMapFuzzy = $this->urlMapFuzzy;
         foreach ($pathExplained as $pathItem) {

@@ -37,7 +37,7 @@ class EzHttp extends AbstractTcpServer
         $request->setIsInit($requestSource->contentLengthActual === $requestSource->contentLength);
         if ($request->isInit()) {
             $bodyArr = $this->interpreter->buildHttpRequestBody($requestSource);
-            $this->interpreter->buildRequestArgs($bodyArr, [], $request);
+            $this->interpreter->buildRequestArgs($bodyArr, null, $request);
         }
         return $request;
     }
@@ -126,11 +126,12 @@ class EzHttp extends AbstractTcpServer
             } elseif (is_array($response) || is_object($response)) {
                 $response = EzCodecUtils::encodeJson($response);
                 $contentType = HttpMimeType::MIME_JSON;
+            } else {
+                $contentType = HttpMimeType::MIME_HTML;
             }
             return new Response(HttpStatus::OK(), $response, $contentType);
         } catch (GearNotFoundResourceException $exception) {
-            var_dump($exception->getMessage());
-            Logger::warn("[Http] {}, {} getDynamicResponse NotFound Exception!]", $exception->getCode(), $exception->getMessage());
+            Logger::warn("[Http] {}, {} getDynamicResponse NotFound Exception!", $exception->getCode(), trim($exception->getMessage()));
             return $this->getNotFoundResourceResponse($request);
         } catch (GearRunTimeException $e) {
             Logger::error($e->getMessage().$e->getFile().":".$e->getLine());

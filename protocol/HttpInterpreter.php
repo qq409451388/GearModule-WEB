@@ -32,9 +32,9 @@ class HttpInterpreter implements Interpreter
         $this->check($httpRequestInfos->accept);
         //获取web路径
         list($path, $args) = $this->parseUri($httpRequestInfos->path);
-
         $request = new Request();
         $request->setPath($path);
+        $request->setQuerys($args);
         $request->setContentLen($httpRequestInfos->contentLength);
         $request->setContentLenActual($httpRequestInfos->contentLengthActual);
         $request->setContentType($httpRequestInfos->contentType);
@@ -197,7 +197,10 @@ class HttpInterpreter implements Interpreter
 
     public function buildRequestArgs($requestBody, $args, IRequest $request){
         $request->setBody($requestBody);
-        foreach($args as $k => $v){
+        if (empty($args)) {
+            return;
+        }
+        foreach ($args as $k => $v) {
             $request->setQuery($k, $v);
         }
     }
