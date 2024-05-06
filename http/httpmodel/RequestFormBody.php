@@ -1,6 +1,6 @@
 <?php
 
-class RequestFormBody implements EzDataObject
+class RequestFormBody extends RequestBody
 {
     /**
      * @var array<string, string>
@@ -13,18 +13,18 @@ class RequestFormBody implements EzDataObject
      */
     public $contentType = HttpMimeType::MIME_WWW_FORM_URLENCODED;
 
-    public function addStruct($k, $v) {
+    public function add($k, $v) {
         $this->data[$k] = $v;
     }
 
-    public function addAllStruct($arr) {
+    public function addAll(array $arr) {
         foreach ($arr as $k => $v) {
-            $this->addStruct($k, $v);
+            $this->add($k, $v);
         }
     }
 
-    public function getForm($k) {
-        return $this->data[$k]??null;
+    public function get($key) {
+        return $this->data[$key]??null;
     }
 
     public function getAllForm() {

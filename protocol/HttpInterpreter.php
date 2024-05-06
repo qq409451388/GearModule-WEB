@@ -114,36 +114,51 @@ class HttpInterpreter implements Interpreter
     }
 
     public function buildHttpRequestBody(RequestSource $requestSource){
-        $contentType = @$requestSource->contentType->contentType??null;
-        $requestBody = $requestSource->bodyContent;
-        switch ($contentType){
-            case HttpMimeType::MIME_WWW_FORM_URLENCODED:
-                parse_str($requestBody, $requestBodyArr);
-                $requestBodyObj = new RequestNormalBody();
-                $requestBodyObj->addAllStruct($requestBodyArr);
-                break;
-            case HttpMimeType::MIME_JSON:
-                $requestBodyObj = new RequestJsonBody();
-                $requestBodyObj->content = $requestBody;
-                break;
-            case HttpMimeType::MIME_MULTI_FORM:
-                /**
-                 * @var $requestBodyArr array<string, RequestBody>
-                 */
-                $requestBodyObj = new RequestMultiBody();
-                $requestBodyObj->data = $this->buildHttpRequestBodyMultiPartForm($requestSource, $requestBody);
-                break;
-            default:
-                $requestBodyObj = new RequestBody();
-                $requestBodyObj->contentType = $contentType;
-                $requestBodyObj->content = $requestBody;
-                $requestBodyObj->contentDispostion = "DEFAULT";
+        if ($requestSource->isBlank()) {
+            return null;
         }
+        $contentType = @$requestSource->contentType->contentType??null;
+        switch ($contentType) {
+            case HttpMimeType::MIME_WWW_FORM_URLENCODED:
+                return $this->buildHttpRequestFormBody($requestSource);
+            case HttpMimeType::MIME_JSON:
+                return $this->buildHttpRequestJsonBody($requestSource);
+            case HttpMimeType::MIME_MULTI_FORM:
+                return $this->buildHttpRequestBodyMultiPartForm($requestSource);
+            default:
+                return $this->buildHttpRequestDefaultBody($requestSource, $contentType);
+        }
+    }
+
+    private function buildHttpRequestDefaultBody(RequestSource $requestSource, $contentType) {
+        $requestBodyObj = new RequestBody();
+        $requestBodyObj->contentType = $contentType;
+        $requestBodyObj->content = $requestSource->bodyContent;
+        $requestBodyObj->contentDispostion = "DEFAULT";
         return $requestBodyObj;
     }
 
-    private function buildHttpRequestBodyMultiPartForm(RequestSource $requestSource, string $requestBody) {
+    private function buildHttpRequestFormBody(RequestSource $requestSource) {
+        parse_str($requestSource->bodyContent, $requestBodyArr);
+        $requestBodyObj = new RequestFormBody();
+        $requestBodyObj->addAll($requestBodyArr);
+        return $requestBodyObj;
+    }
+
+    private function buildHttpRequestJsonBody(RequestSource $requestSource) {
+        $requestBodyObj = new RequestJsonBody();
+        $requestBodyObj->content = $requestSource->bodyContent;
+        return $requestBodyObj;
+    }
+
+    private function buildHttpRequestBodyMultiPartForm(RequestSource $requestSource) {
+        $requestBodyObj = new RequestMultiBody();
+
+        $requestBody = $requestSource->bodyContent;
         $requestBodyArrInit = explode("\r\n", $requestBody);
+        /**
+         * @var $requestBodyArr array<string, RequestBody>
+         */
         $requestBodyArr = [];
         foreach ($requestBodyArrInit as $requestBodyLine) {
             $matchBoundary = false;
@@ -192,7 +207,8 @@ class HttpInterpreter implements Interpreter
             //为下一行数据使用
             $isEmptyLine = empty($requestBodyLine);
         }
-        return $requestBodyArr;
+        $requestBodyObj->data = $requestBodyArr;
+        return $requestBodyObj;
     }
 
     public function buildRequestArgs($requestBody, $args, IRequest $request){

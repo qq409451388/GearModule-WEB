@@ -42,4 +42,8 @@ class RequestSource implements EzDataObject
     public function getCustomHeaders() {
         return $this->customHeaders;
     }
+
+    public function isBlank() {
+        return 0 === $this->contentLengthActual || is_null($this->contentType);
+    }
 }

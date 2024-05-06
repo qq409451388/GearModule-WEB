@@ -20,11 +20,9 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
 
     private $query = [];
     /**
-     * @var RequestJsonBody|RequestMultiBody|RequestNormalBody|RequestBody
+     * @var RequestJsonBody|RequestMultiBody|RequestFormBody|RequestBody
      */
     private $body;
-    //request build succ
-    protected $isInit = false;
 
     /**
      * @var RequestSource $requestSource
@@ -69,8 +67,8 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
         $body = $this->getBody();
         if ($body instanceof RequestJsonBody) {
             return $body->getData();
-        } else if ($body instanceof RequestNormalBody) {
-            return $body->getAll();
+        } else if ($body instanceof RequestFormBody) {
+            return $body->getAllForm();
         } else if ($body instanceof RequestMultiBody) {
             return $body->getTextMap();
         } else {

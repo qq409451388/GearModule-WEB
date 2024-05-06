@@ -1,23 +1,19 @@
 <?php
 
-class RequestJsonBody extends RequestBody implements EzDataObject
+class RequestJsonBody extends RequestBody
 {
     /**
      * @var string $contentType
      */
     public $contentType = HttpMimeType::MIME_JSON;
 
-    /**
-     * @var string $content requestData
-     */
-    public $content;
+    private $contentCache;
 
-    public function toString () {
-        return EzObjectUtils::toString(get_object_vars($this));
-    }
-
-    public function getData() {
-        return EzCodecUtils::decodeJson($this->content);
+    public function get($key) {
+        if (is_null($this->contentCache)) {
+            $this->contentCache = EzCodecUtils::decodeJson($this->content);
+        }
+        return $this->contentCache[$key]??null;
     }
 
     public function getObject(Clazz $clazz) {
