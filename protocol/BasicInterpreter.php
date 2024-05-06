@@ -1,7 +1,15 @@
 <?php
 class BasicInterpreter implements Interpreter {
+    /**
+     * @var Closure $requestHandler
+     */
     private $requestHandler;
+
+    /**
+     * @var Closure $responseHandler
+     */
     private $responseHandler;
+
     public function getSchema(): string
     {
         return SchemaConst::TCP;
@@ -15,21 +23,6 @@ class BasicInterpreter implements Interpreter {
     public function decode(string $content): IRequest
     {
         return ($this->requestHandler)($content);
-    }
-
-    public function getNotFoundResourceResponse(IRequest $request): IResponse
-    {
-        return null;
-    }
-
-    public function getNetErrorResponse(IRequest $request, string $errorMessage = ""): IResponse
-    {
-        return null;
-    }
-
-    public function getDynamicResponse(IRequest $request): IResponse
-    {
-        return null;
     }
 
     /**
