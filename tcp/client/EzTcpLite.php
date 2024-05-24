@@ -4,9 +4,9 @@ class EzTcpLite extends BaseTcpClient
     public function init($ip, $port):BaseTcpClient{
         parent::init($ip, $port);
         $this->conn = socket_create(AF_INET,SOCK_STREAM,SOL_TCP);
-        socket_connect($this->conn, $ip, $port);
-        socket_set_option($this->conn, SOL_SOCKET, SO_KEEPALIVE, 10000);
-        socket_set_block($this->conn);
+        @socket_connect($this->conn, $ip, $port);
+        @socket_set_option($this->conn, SOL_SOCKET, SO_KEEPALIVE, 10000);
+        @socket_set_block($this->conn);
         return $this;
     }
 

@@ -30,7 +30,6 @@ abstract class AbstractTcpServer extends AbstractWebServer
 
     public function __construct($ip, $port) {
         parent::__construct($ip, $port);
-
         $master = socket_create(AF_INET, SOCK_STREAM, 0);
         $this->serverConnection = new EzTcpServerConnection($master);
         //复用地址
@@ -57,7 +56,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
     }
 
     private function detection() {
-        $errCode = socket_last_error();
+        $errCode = socket_last_error($this->getMaster());
         DBC::assertEquals(0, $errCode, socket_strerror($errCode), $errCode, GearShutDownException::class);
     }
 

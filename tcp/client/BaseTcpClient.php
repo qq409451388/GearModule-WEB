@@ -7,8 +7,8 @@ abstract class BaseTcpClient
     //资源管理器
     protected static $instance;
 
-    private $ip;
-    private $port;
+    protected $ip;
+    protected $port;
 
     public static function get($ip, $port){
         $key = $ip.$port;

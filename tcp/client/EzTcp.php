@@ -8,6 +8,7 @@ class EzTcp extends BaseTcpClient
         parent::init($ip, $port);
         $this->conn = @stream_socket_client("tcp://{$ip}:{$port}", $errno, $errstr);
         DBC::assertEquals(0, $errno, "[EzTcp] Exception Caused by $errstr", $errno);
+        //$this->setNonBlock();
         $this->addMain();
         return $this;
     }
@@ -51,13 +52,39 @@ class EzTcp extends BaseTcpClient
     }
 
     public function send($msg){
-        fwrite($this->conn, $msg);
+        $t1 = microtime(true);
+        fwrite($this->conn, $msg); // 发送消息
         $ret = "";
-        //循环遍历获取句柄中的数据，其中 feof() 判断文件指针是否指到文件末尾
-        while (!feof($this->conn)){
-            stream_set_timeout($this->conn, 2);
-            $ret .= fgets($this->conn, 128);
+        $read = [$this->conn];
+        $write = null;
+        $exception = null;
+        $maxWait = 10; // 最大等待时间（秒）
+        $startTime = microtime(true);
+
+        while (true) {
+            // 计算已等待时间
+            $elapsedTime = microtime(true) - $startTime;
+            if ($elapsedTime >= $maxWait) {
+                break; // 已等待超过最大等待时间，跳出循环
+            }
+
+            // 计算剩余等待时间
+            $remainingTime = $maxWait - $elapsedTime;
+
+            // 使用 stream_select 等待数据到达
+            if (stream_select($read, $write, $exception, 0, $remainingTime) > 0) {
+                $data = fgets($this->conn, 128);
+                if ($data === false) {
+                    break; // 读取结束，跳出循环
+                }
+                $ret .= $data;
+            } else {
+                break; // 没有数据可读，跳出循环
+            }
         }
+
+        $t2 = microtime(true);
+        var_dump($t2 - $t1); // 输出时间差以调试性能
         return $ret;
     }
 
