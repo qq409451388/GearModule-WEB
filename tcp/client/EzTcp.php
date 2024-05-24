@@ -6,7 +6,7 @@ class EzTcp extends BaseTcpClient
 
     public function init($ip, $port):BaseTcpClient{
         parent::init($ip, $port);
-        $this->conn = stream_socket_client("tcp://{$ip}:{$port}", $errno, $errstr);
+        $this->conn = @stream_socket_client("tcp://{$ip}:{$port}", $errno, $errstr);
         DBC::assertEquals(0, $errno, "[EzTcp] Exception Caused by $errstr", $errno);
         $this->addMain();
         return $this;

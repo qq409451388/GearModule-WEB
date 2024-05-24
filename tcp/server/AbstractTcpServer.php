@@ -119,7 +119,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
             return;
         }
         $this->serverConnection->disconnect($clientSocket);
-        Logger::console(spl_object_id($clientSocket)." CLOSED!");
+        //Logger::console(spl_object_id($clientSocket)." CLOSED!");
     }
 
     /**
