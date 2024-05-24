@@ -104,6 +104,7 @@ class RespInterpreter implements Interpreter
                 "[EzResp Exception] Unknow Command $request->command!");
             $result = call_user_func_array([$this->localCache, $request->command], $request->args);
             $this->localCache->tryRelease();
+            var_dump($this->localCache);
             $response = new RespResponse();
             if (is_bool($result)) {
                 $isSuccess = $result;
