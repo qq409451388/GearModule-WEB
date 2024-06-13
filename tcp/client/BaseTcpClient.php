@@ -46,4 +46,11 @@ abstract class BaseTcpClient
         return $this->port;
     }
 
+    public function keepAlive() {
+        @socket_set_option($this->conn, SOL_SOCKET, SO_KEEPALIVE, true);
+    }
+
+    public function noKeepAlive() {
+        @socket_set_option($this->conn, SOL_SOCKET, SO_KEEPALIVE, false);
+    }
 }
