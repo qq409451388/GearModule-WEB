@@ -22,9 +22,23 @@ class EzResp extends AbstractTcpServer
     protected function buildResponse(EzConnection $connection, IRequest $request): IResponse
     {
         try {
-            DBC::assertTrue(method_exists($this->localCache, $request->command),
-                "[EzResp Exception] Unknow Command $request->command!");
-            $result = call_user_func_array([$this->localCache, $request->command], $request->args);
+            if ("COMMAND" == $request->command) {
+                if ("DOCS" == current($request->args)) {
+                    $docs = file_get_contents(Application::getContext()->getGearPath()."/modules/web/ezresp/docs.txt");
+                    $result = "$".strlen($docs);
+                    $result .= PHP_EOL;
+                    $result .= $docs;
+                }
+            } else {
+                DBC::assertTrue(method_exists($this->localCache, $request->command),
+                    "[EzResp Exception] Unknow Command $request->command!");
+                try {
+                    $result = call_user_func_array([$this->localCache, $request->command], $request->args);
+                } catch (Throwable $e) {
+                    DBC::throwEx("[EzResp Exception] Unknow Command $request->command!", 0);
+                    $result = "Unknow";
+                }
+            }
             $this->localCache->tryRelease();
             $response = new RespResponse();
             if (is_bool($result)) {

@@ -128,12 +128,24 @@ abstract class AbstractTcpServer extends AbstractWebServer
      * @return void
      */
     protected function writeSocket($socket, $content) {
+        $allowTryTime = 3;
+        $tryTime = 0;
         try {
             do {
                 $contentLen = strlen($content);
                 $writeByte = socket_write($socket, $content, $contentLen);
                 if (false === $writeByte) {
-                    DBC::throwEx("[TcpServer] write fail!", 0, GearUnsupportedOperationException::class);
+                    if ($tryTime > $allowTryTime) {
+                        DBC::throwEx("[TcpServer] write fail! try over $tryTime times!", 0, GearUnsupportedOperationException::class);
+                    }
+                    $errCode = socket_last_error($socket);
+                    if (35 == $errCode) {
+                        usleep(10000000);
+                        $tryTime++;
+                        continue;
+                    }
+                    $errMsg = socket_strerror($errCode);
+                    DBC::throwEx("[TcpServer] write fail! $errMsg", $errCode, GearUnsupportedOperationException::class);
                 }
                 if (0 == $contentLen || empty($content)) {
                     socket_write($socket, "\r\n");
