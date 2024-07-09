@@ -7,6 +7,8 @@ class RequestMultiBody implements EzDataObject
      */
     public $data;
 
+    public $contentDispostion;
+
     public function toString () {
         return EzObjectUtils::toString(get_object_vars($this));
     }

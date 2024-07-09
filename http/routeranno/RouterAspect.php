@@ -23,7 +23,7 @@ class RouterAspect extends Aspect implements BuildAspect, RunTimeAspect
          * 存在一个有效就往下走
          */
         $hasValid = false;
-        DBC::assertNonNull($this->getDependList(), "[RouterAspect] DependList Is Empty !");
+        DBC::assertNotEmpty($this->getDependList(), "[RouterAspect] {$this->getAtClass()->getName()} DependList Is Empty !");
         foreach ($this->getDependList() as $dependSon) {
             if ($dependSon->getAtMethod()->isPublic()
                 && "BaseController" !== $dependSon->getAtMethod()->getDeclaringClass()->getName()) {
