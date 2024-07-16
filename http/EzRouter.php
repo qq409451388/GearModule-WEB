@@ -64,9 +64,10 @@ class EzRouter implements EzBean
     }
 
     public function judgePath($path):bool {
-        if (Env::useFuzzyRouter()) {
+        //todo
+        /*if (Env::useFuzzyRouter()) {
             return !is_null($this->getMapping($path));
-        }
+        }*/
         $path = strtolower($path);
         return isset($this->urlMap[$path]);
     }

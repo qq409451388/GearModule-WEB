@@ -104,7 +104,7 @@ class EzHttp extends AbstractTcpServer
     }
 
     private function judgePath($path):bool {
-        return true;
+        return (BeanFinder::get()->fetch(EzRouter::class))->judgePath($path);
     }
 
     private function getDynamicResponse(IRequest $request):IResponse{

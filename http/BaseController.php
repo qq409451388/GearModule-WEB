@@ -7,6 +7,9 @@ class BaseController implements EzBean
     }
 
     protected function show($response, $path) {
+        if (!isset($response['host'])) {
+            $response['host'] = "http://".Config::get("application.server.ip").":".Config::get("application.server.port");
+        }
         extract($response);
         $template = Application::getContext()->getAppPath().DIRECTORY_SEPARATOR.$path;
         //$template = strtolower();

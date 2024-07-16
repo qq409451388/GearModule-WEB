@@ -115,7 +115,7 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
 
     public function isEmpty():bool{
         DBC::assertTrue($this->isInit(), "[Request] Exception Has Not Inited!");
-        return empty($this->request);
+        return empty($this->body) && empty($this->query);
     }
 
     public function setRequestMethod($requestMethod){
