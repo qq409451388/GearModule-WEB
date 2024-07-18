@@ -40,7 +40,7 @@ class HttpInterpreter implements Interpreter
         $request->setContentType($httpRequestInfos->contentType);
         $request->setRequestMethod(HttpMethod::get($httpRequestInfos->requestMethod));
         $request->setIsInit($httpRequestInfos->contentLength == $httpRequestInfos->contentLengthActual);
-        $request->setCustomHeaders($httpRequestInfos->getCustomHeaders());
+        $request->setHeaders($httpRequestInfos->getCustomHeaders());
         if ($request->isInit()) {
             $requestBody = $this->buildHttpRequestBody($httpRequestInfos);
             $this->buildRequestArgs($requestBody, $args, $request);

@@ -204,7 +204,7 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
     }
 
     public function toString () {
-        return EzString::toString(get_object_vars($this));
+        return EzObjectUtils::toString($this);
     }
 
     /**
@@ -219,11 +219,11 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
         return $this->query;
     }
 
-    public function setCustomHeaders($customHeaders) {
+    public function setHeaders($customHeaders) {
         $this->customHeaders = $customHeaders;
     }
 
-    public function getCustomHeader($key) {
+    public function getHeader($key) {
         return $this->customHeaders[$key]??null;
     }
 
