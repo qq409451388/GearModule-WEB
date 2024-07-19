@@ -7,6 +7,9 @@ class BaseController implements EzBean
     }
 
     protected function show($response, $path) {
+        if (!isset($response['domain'])) {
+            $response['domain'] = Config::get("application.domain");
+        }
         extract($response);
         $template = Application::getContext()->getAppPath().DIRECTORY_SEPARATOR.$path;
         //$template = strtolower();
@@ -35,5 +38,17 @@ class BaseController implements EzBean
 
     protected function response500() {
         return new Response(HttpStatus::INTERNAL_SERVER_ERROR());
+    }
+
+    protected function redirect($path) {
+        $url = "http://".Config::get("application.domain")."/".$path;
+        $response = new Response(HttpStatus::FOUND_302());
+        $response->setCustomHeaders(['Location' => $url]);
+        return $response;
+    }
+
+    protected function setCookie(Response $response, $key, $value)
+    {
+        $response->setCustomHeader("Set-Cookie","$key=$value");
     }
 }

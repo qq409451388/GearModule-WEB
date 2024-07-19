@@ -227,4 +227,24 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
         return $this->customHeaders[$key]??null;
     }
 
+    public function getCookie($key) {
+        $cookies = $this->parseCookies();
+        return isset($cookies[$key]) ? $cookies[$key] : null;
+    }
+
+    private function parseCookies() {
+        $cookieHeader = $this->getHeader("cookie");
+        $cookies = [];
+        if (empty($cookieHeader)) {
+            return $cookies;
+        }
+        $cookiePairs = explode('; ', $cookieHeader);
+
+        foreach ($cookiePairs as $cookie) {
+            list($key, $value) = explode('=', $cookie, 2);
+            $cookies[$key] = urldecode($value);
+        }
+
+        return $cookies;
+    }
 }

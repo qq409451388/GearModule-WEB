@@ -21,6 +21,10 @@ class HttpStatus
         return new self(200, "OK");
     }
 
+    public static function FOUND_302(){
+        return new self(302, "Found");
+    }
+
     public static function BAD_REQUEST(){
         return new self(400, "BAD_REQUEST");
     }
@@ -51,5 +55,21 @@ class HttpStatus
 
     public static function CONTINUE(){
         return new self(100, "CONTINUE");
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getOthers()
+    {
+        return $this->others;
+    }
+
+    /**
+     * @param mixed|null $others
+     */
+    public function setOthers($others): void
+    {
+        $this->others = $others;
     }
 }

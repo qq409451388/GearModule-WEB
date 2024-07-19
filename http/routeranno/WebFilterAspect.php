@@ -3,6 +3,13 @@ class WebFilterAspect extends Aspect implements RunTimeAspect
 {
     public function before(RunTimeProcessPoint $rpp): void
     {
+        /**
+         * @var AnnoationElement
+         */
+        $ignore = $rpp->getClassInstance()->getMethod($rpp->getFunctionName())->getAnnoation(Clazz::get(WebFilterIgnore::class));
+        if (!is_null($ignore) && $ignore->annoName === WebFilterIgnore::class) {
+            return;
+        }
         $authClass = $this->getValue()->getClassName();
         $atClass = $this->getAtClass()->getName();
         DBC::assertTrue(BeanFinder::get()->has($authClass), "[WebFilter] the class $atClass has use a webfilter class $authClass, but not found!");

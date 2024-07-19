@@ -8,6 +8,7 @@ class Response implements IResponse,EzDataObject
     private $content;
     private $contentType;
     private $charset;
+    private $customHeaders;
 
     public function __construct(HttpStatus $header, $content = null, $contentType = HttpMimeType::MIME_HTML, $charset = "charset=utf-8;"){
         $this->httpStatus = $header;
@@ -64,5 +65,26 @@ class Response implements IResponse,EzDataObject
 
     public function toString():string{
         return (new HttpInterpreter())->encode($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomHeaders()
+    {
+        return $this->customHeaders;
+    }
+
+    /**
+     * @param mixed $customHeaders
+     */
+    public function setCustomHeaders($customHeaders): void
+    {
+        $this->customHeaders = $customHeaders;
+    }
+
+    public function setCustomHeader($key, $customHeader): void
+    {
+        $this->customHeaders[$key] = $customHeader;
     }
 }

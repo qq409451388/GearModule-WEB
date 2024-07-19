@@ -12,6 +12,11 @@ class HttpInterpreter implements Interpreter
      */
     public function encode(IResponse $response): string {
         $header = "HTTP/1.1 {$response->getHeader()->getCode()} {$response->getHeader()->getStatus()}\r\n";
+        if (!empty($response->getCustomHeaders())) {
+            foreach ($response->getCustomHeaders() as $key => $value) {
+                $header .= "{$key}: {$value}\r\n";
+            }
+        }
         $header .= "Server: Gear2\r\n";
         $header .= "Date: ".gmdate('D, d M Y H:i:s T')."\r\n";
         $header .= "Content-Type: {$response->getContentType()}\r\n";
