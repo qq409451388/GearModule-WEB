@@ -37,6 +37,5 @@ class WebFilterAspect extends Aspect implements RunTimeAspect
 
     public function after(RunTimeProcessPoint $rpp): void
     {
-        var_dump("after");
     }
 }
