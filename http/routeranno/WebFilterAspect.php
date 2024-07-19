@@ -31,7 +31,9 @@ class WebFilterAspect extends Aspect implements RunTimeAspect
         if (!$checkRes) {
             //$rpp->setReturnValue(EzRpcResponse::error(403));
             $rpp->setIsSkip(true);
-            $rpp->tampering(EzRpcResponse::error(403, "No Auth."));
+            $response = new Response(HttpStatus::FOUND_302());
+            $response->setCustomHeader("Location", "http://".Config::get("application.domain")."/admin/login");
+            $rpp->tampering($response);
         }
     }
 
