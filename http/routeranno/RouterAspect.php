@@ -67,7 +67,7 @@ class RouterAspect extends Aspect implements BuildAspect, RunTimeAspect
             }
         }
         DBC::assertNonNull($mapping, "[RouterAspect] UrlMapping Not Found!");
-        if ($mapping->getHttpMethod() !== $request->getRequestMethod()) {
+        if (!is_null($mapping->getHttpMethod()) && $mapping->getHttpMethod() !== $request->getRequestMethod()) {
             $rpp->setIsSkip(true);
             $response = new Response(HttpStatus::BAD_REQUEST(), "Http Method {$request->getRequestMethod()} Is Not Support!");
             $rpp->setReturnValue($response);
