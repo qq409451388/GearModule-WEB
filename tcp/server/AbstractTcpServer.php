@@ -28,7 +28,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
 
     protected $requestPool = [];
 
-    public function __construct($ip, $port) {
+    public function __construct($ip = "", $port = 0) {
         parent::__construct($ip, $port);
         $master = socket_create(AF_INET, SOCK_STREAM, 0);
         $this->serverConnection = new EzTcpServerConnection($master);

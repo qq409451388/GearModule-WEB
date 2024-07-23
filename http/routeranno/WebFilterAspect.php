@@ -15,7 +15,7 @@ class WebFilterAspect extends Aspect implements RunTimeAspect
         DBC::assertTrue(BeanFinder::get()->has($authClass), "[WebFilter] the class $atClass has use a webfilter class $authClass, but not found!");
 
         /**
-         * @var AuthCheck $checker
+         * @var IWebFilter $checker
          */
         $checker = BeanFinder::get()->pull($authClass);
         $request = null;
@@ -29,11 +29,8 @@ class WebFilterAspect extends Aspect implements RunTimeAspect
         }
         $checkRes = $checker->filter($request);
         if (!$checkRes) {
-            //$rpp->setReturnValue(EzRpcResponse::error(403));
             $rpp->setIsSkip(true);
-            $response = new Response(HttpStatus::FOUND_302());
-            $response->setCustomHeader("Location", "http://".Config::get("application.domain")."/admin/login");
-            $rpp->tampering($response);
+            $rpp->tampering($checker->ifFail($request));
         }
     }
 

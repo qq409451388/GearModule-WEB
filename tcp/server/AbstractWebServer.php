@@ -10,16 +10,18 @@ abstract class AbstractWebServer
      */
     protected $interpreter;
 
-    public function __construct(string $ip = "", int $port = null) {
+    public function __construct(string $ip = "", int $port = 0) {
         if (empty($ip)) {
             $ip = Config::get('application.server.ip');
             if (empty($ip)) {
+                Logger::warn("[Server] Unset server ip, use default.");
                 $ip = "127.0.0.1";
             }
         }
         if (empty($port)) {
             $port = Config::get('application.server.port');
             if (empty($port)) {
+                Logger::warn("[Server] Unset server port, use default.");
                 $port = 8080;
             }
         }
