@@ -10,6 +10,9 @@ class BaseController implements EzBean
         if (!isset($response['domain'])) {
             $response['domain'] = Config::get("application.domain");
         }
+        if (!isset($response['staticDomain'])) {
+            $response['staticDomain'] = Config::get("application.staticDomain");
+        }
         extract($response);
         $template = Application::getContext()->getAppPath().DIRECTORY_SEPARATOR.$path;
         //$template = strtolower();
