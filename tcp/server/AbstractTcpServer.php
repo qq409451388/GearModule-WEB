@@ -73,7 +73,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
         }
         DBC::assertTrue(self::MASTER != $alias || $this->getMaster() == $clientSocket,
             "[EzWebSocketServer Exception] Cant Set Alias To ".self::MASTER);
-        DBC::assertFalse($this->hasConnect($alias), "[EzWebSocketServer Exception] {$alias} Already Connected!");
+        DBC::assertFalse($this->hasConnect($alias), "[Exception] {$alias} Already Connected!");
         if (self::MASTER != $alias) {
             socket_set_nonblock($clientSocket);
             //Logger::console($clientSocket." CONNECTED!");
@@ -177,11 +177,12 @@ abstract class AbstractTcpServer extends AbstractWebServer
                 if ($this->getMaster() == $readSocket) {
                     $socket = $this->newConnect();
                     if (!is_null($socket)) {
+
                         //刚刚建立连接的socket对象没有别名
-                        $this->addConnectPool($socket, spl_object_id($socket));
+                        $this->addConnectPool($socket, $this->getSocketId($socket));
                     }
                 } else {
-                    $readLength = self::SOCKET_READ_LENGTH;
+                    $readLength = Config::get("application.server.http_server_request_limit");
                     $lastRequest = $this->getLastRequest($readSocket);
                     $recv = @socket_recv($readSocket, $buffer, $readLength, 0);
                     if ($recv == 0) {
@@ -193,7 +194,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
                     $connection->setClientSocket($readSocket);
                     //接收并处理消息体
                     $request = $this->buildRequest($connection, $lastRequest);
-                    $request->setRequestId(spl_object_id($readSocket));
+                    $request->setRequestId($this->getSocketId($readSocket));
                     $this->checkAndClearRequest($request);
                     if ($request->isInit()) {
                         $response = $this->buildResponse($connection, $request);
@@ -209,7 +210,16 @@ abstract class AbstractTcpServer extends AbstractWebServer
     }
 
     private function getLastRequest($clientSocket) {
-        return $this->requestPool[spl_object_id($clientSocket)]??null;
+        return $this->requestPool[$this->getSocketId($clientSocket)]??null;
+    }
+
+    private function getSocketId($socket):int {
+        if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            $socketId = spl_object_id($socket);
+        } else {
+            $socketId = (int)$socket;
+        }
+        return $socketId;
     }
 
     private function checkAndClearRequest(IRequest $request) {
