@@ -1,4 +1,5 @@
 <?php
+
 class WebFilter extends Anno
 {
     protected $className;

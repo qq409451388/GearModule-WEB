@@ -3,7 +3,7 @@
 /**
  * 基础请求体对象
  */
-class RequestBody implements EzDataObject
+class RequestBody extends EzObject implements EzDataObject
 {
     /**
      * @var string $requestName the key of requestData

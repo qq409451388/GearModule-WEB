@@ -1,6 +1,6 @@
 <?php
 
-abstract class NetWorkRequest implements IRequest
+abstract class NetWorkRequest extends EzObject implements IRequest
 {
     protected $isInit;
 

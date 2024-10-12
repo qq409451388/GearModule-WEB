@@ -1,4 +1,5 @@
 <?php
+
 class RouterAspect extends Aspect implements BuildAspect, RunTimeAspect
 {
     private function getHttpMethodLimit() {

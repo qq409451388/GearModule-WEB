@@ -1,4 +1,5 @@
 <?php
+
 class WebFilterAspect extends Aspect implements RunTimeAspect
 {
     public function before(RunTimeProcessPoint $rpp): void

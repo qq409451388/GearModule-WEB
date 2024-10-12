@@ -1,6 +1,6 @@
 <?php
 
-class RequestSource implements EzDataObject
+class RequestSource extends EzObject implements EzDataObject
 {
     public $requestMethod;
     public $path;

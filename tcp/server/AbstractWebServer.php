@@ -15,7 +15,7 @@ abstract class AbstractWebServer
             $ip = Config::get('application.server.ip');
             if (empty($ip)) {
                 Logger::warn("[Server] Unset server ip, use default.");
-                $ip = "127.0.0.1";
+                $ip = Env::getIp() ?? "127.0.0.1";
             }
         }
         if (empty($port)) {

@@ -1,4 +1,5 @@
 <?php
+
 class PostMapping extends RequestMapping implements AnnoationCombination {
 
     public function getPath() {

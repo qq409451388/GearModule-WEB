@@ -1,6 +1,6 @@
 <?php
 
-class RequestMultiBody implements EzDataObject
+class RequestMultiBody extends EzObject implements EzDataObject
 {
     /**
      * @var array<string, RequestBody>

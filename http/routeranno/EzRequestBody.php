@@ -1,4 +1,5 @@
 <?php
+
 class EzRequestBody extends Anno
 {
     private $paramType;

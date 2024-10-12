@@ -1,5 +1,5 @@
 <?php
-abstract class EzWebSocketRequestItem implements EzDataObject
+abstract class EzWebSocketRequestItem extends EzObject implements EzDataObject
 {
 
 }

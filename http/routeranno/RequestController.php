@@ -1,4 +1,5 @@
 <?php
+
 class RequestController extends Anno implements AnnoationCombination
 {
     private static $depend = [

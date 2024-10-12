@@ -1,8 +1,6 @@
 <?php
 abstract class AbstractTcpServer extends AbstractWebServer
 {
-    private $responseBuilder;
-
     protected $keepAlive = false;
     /**
      * @var EzTcpServerConnection $serverConnection
@@ -13,11 +11,6 @@ abstract class AbstractTcpServer extends AbstractWebServer
      * @var int 连接超时时间（单位：s）
      */
     protected $timeOut = 3;
-
-    /**
-     * socket read长度
-     */
-    const SOCKET_READ_LENGTH = 1024000;
 
     /**
      * 保留字 MASTER alias
