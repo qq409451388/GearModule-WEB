@@ -1,33 +1,28 @@
 <?php
 
-class RequestMapping extends Anno implements AnnoationCombination
+class RequestMapping extends BuildAnnotation implements AnnoationCombination
 {
 
     public function getPath() {
         return $this->value;
     }
 
-    public static function constTarget()
+    public function constTarget()
     {
         return AnnoElementType::TYPE_METHOD;
     }
 
-    public static function constPolicy()
-    {
-        return AnnoPolicyEnum::POLICY_BUILD;
-    }
-
-    public static function constStruct()
+    public function constStruct()
     {
         return AnnoValueTypeEnum::TYPE_NORMAL;
     }
 
-    public static function constAspect()
+    public function constAspect()
     {
         return RouterAspect::class;
     }
 
-    public static function constDepend()
+    public function constDepend()
     {
         return null;
     }

@@ -1,6 +1,6 @@
 <?php
 
-class RequestController extends Anno implements AnnoationCombination
+class RequestController extends BuildAnnotation implements AnnoationCombination
 {
     private static $depend = [
         GetMapping::class,
@@ -12,27 +12,22 @@ class RequestController extends Anno implements AnnoationCombination
         return $this->value;
     }
 
-    public static function constTarget()
+    public function constTarget()
     {
         return AnnoElementType::TYPE_CLASS;
     }
 
-    public static function constPolicy()
-    {
-        return AnnoPolicyEnum::POLICY_BUILD;
-    }
-
-    public static function constStruct()
+    public function constStruct()
     {
         return AnnoValueTypeEnum::TYPE_NORMAL;
     }
 
-    public static function constAspect()
+    public function constAspect()
     {
         return RouterAspect::class;
     }
 
-    public static function constDepend()
+    public function constDepend()
     {
         return self::$depend;
     }

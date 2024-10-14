@@ -157,7 +157,7 @@ abstract class AbstractTcpServer extends AbstractWebServer
 
     public function start() {
         DBC::assertTrue($this->isInit, "[TcpServer] Must Run TcpServer::init() first!", 0, GearShutDownException::class);
-        Logger::console("Start Server Success! ".$this->schema."://".$this->ip.":".$this->port);
+        Logger::info("Start Server Success! ".$this->schema."://".$this->ip.":".$this->port);
         while (true) {
             $readSockets = $this->serverConnection->getConnectPool();
             $writeSockets = null;

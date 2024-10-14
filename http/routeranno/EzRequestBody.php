@@ -1,6 +1,6 @@
 <?php
 
-class EzRequestBody extends Anno
+class EzRequestBody extends RuntimeAnnotation
 {
     private $paramType;
     private $paramName;
@@ -25,24 +25,14 @@ class EzRequestBody extends Anno
         return Clazz::get($this->paramType);
     }
 
-    public static function constTarget()
+    public function constTarget()
     {
         return AnnoElementType::TYPE_METHOD;
     }
 
-    public static function constPolicy()
-    {
-        return AnnoPolicyEnum::POLICY_ACTIVE;
-    }
-
-    public static function constStruct()
+    public function constStruct()
     {
         return AnnoValueTypeEnum::TYPE_LIST;
-    }
-
-    public static function constAspect()
-    {
-        return null;
     }
 
 }

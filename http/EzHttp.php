@@ -153,7 +153,7 @@ class EzHttp extends AbstractTcpServer
     }
 
     public function start() {
-        Logger::console("[HTTP]Start HTTP Server...");
+        Logger::info("[HTTP]Start HTTP Server...");
         try{
             parent::start();
         } catch (Exception $e) {
